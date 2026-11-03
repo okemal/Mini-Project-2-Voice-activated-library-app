@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4ee">
+  <title>Voice library · Collection desk</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Library collection">
+      <span class="brand-mark" aria-hidden="true">▤</span>
+      <span class="brand-name">Alder Library<small>THE COLLECTION DESK</small></span>
+    </a>
+    <nav class="main-nav" aria-label="Main navigation"><a href="#voice-desk">Voice desk</a><a class="active" href="#collection">Collection</a></nav>
+  </header>
+
+  <main class="page-shell">
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <p class="eyebrow">THE COLLECTION DESK</p>
+        <h1 id="hero-title">A place for every story.</h1>
+        <p class="hero-copy">A little conversation. A well-kept collection.</p>
+      </div>
+      <div class="hero-tools">
+        <div class="stat"><strong id="total-count">—</strong><span>TOTAL ITEMS</span></div>
+        <div class="stat"><strong id="available-count">—</strong><span>AVAILABLE</span></div>
+        <div class="stat"><strong id="loan-count">—</strong><span>ON LOAN</span></div>
+        <button class="button button-primary" id="add-item"><span>＋</span> Add item</button>
+      </div>
+    </section>
+
+    <section id="voice-desk" class="voice-desk" aria-labelledby="voice-title">
+      <div class="voice-heading">
+        <div><p class="eyebrow">YOUR VOICE LIBRARIAN</p><h2 id="voice-title">Ask the collection.</h2></div>
+        <span class="speech-badge">Azure Speech · English (US)</span>
+      </div>
+      <div class="voice-controls">
+        <button id="voice-record" class="button button-primary" type="button" disabled>Start speaking</button>
+        <button id="voice-discard" class="button button-secondary" type="button" hidden>Discard recording</button>
+        <p id="voice-state" role="status">Checking speech configuration…</p>
+        <label class="speech-toggle"><input type="checkbox" id="voice-speak" checked> Spoken replies</label>
+      </div>
+      <p class="voice-privacy">Click to start, then stop to send up to 30 seconds of audio to Azure. Recordings are not saved by this app. Review each change before confirming it.</p>
+      <div class="voice-workspace">
+        <form id="voice-form">
+          <label class="field-label" for="voice-transcript">Your command <span>· edit the transcript or type here</span></label>
+          <textarea id="voice-transcript" maxlength="1200" rows="3" placeholder="Try: list available books" required spellcheck="false"></textarea>
+          <button class="button button-secondary" id="voice-submit" type="submit">Review command</button>
+        </form>
+        <div class="voice-conversation">
+          <div id="voice-review" class="voice-review" hidden>
+            <h3>Review before applying</h3>
+            <p id="voice-summary"></p>
+            <p id="voice-target"></p>
+            <p class="voice-help">Say “confirm” or “cancel”, or use the buttons. Review expires after two minutes.</p>
+            <div class="review-actions">
+              <button id="voice-confirm" class="button button-primary" type="button">Confirm change</button>
+              <button id="voice-cancel" class="button button-secondary" type="button">Cancel</button>
+            </div>
+          </div>
+          <div class="voice-response">
+            <h3>Librarian’s response</h3>
+            <p id="voice-response-text" role="status">Ready when you are. Start with “list items”.</p>
+            <ul id="voice-results" hidden></ul>
+          </div>
+          <audio id="voice-audio" controls hidden aria-label="Librarian's spoken response"></audio>
+          <p id="voice-audio-status" role="status" class="voice-help"></p>
+        </div>
+      </div>
+      <details class="voice-examples">
+        <summary>Commands you can say</summary>
+        <p>Say the field names in order. Click an example to edit it. Use double quotes around titles containing field words such as “author”.</p>
+        <div class="example-grid">
+          <button type="button" data-command="Create item, type book, title The Catcher in the Rye, author J. D. Salinger, pages 220"><strong>Create</strong><span>Create item, type book, title The Catcher in the Rye, author J. D. Salinger, pages 220</span></button>
+          <button type="button" data-command="List available books"><strong>List &amp; filter</strong><span>List available books</span></button>
+          <button type="button" data-command="Get item three"><strong>Read one</strong><span>Get item three</span></button>
+          <button type="button" data-command="Replace item 3, title The Hobbit, author J. R. R. Tolkien, pages 320"><strong>Replace all fields</strong><span>Replace item 3, title The Hobbit, author J. R. R. Tolkien, pages 320</span></button>
+          <button type="button" data-command="Update item 3, pages 310"><strong>Update a field</strong><span>Update item 3, pages 310</span></button>
+          <button type="button" data-command="Delete item 3"><strong>Delete</strong><span>Delete item 3</span></button>
+          <button type="button" data-command="Check out item 3"><strong>Check out</strong><span>Check out item 3</span></button>
+          <button type="button" data-command="Return item 3"><strong>Return</strong><span>Return item 3</span></button>
+        </div>
+      </details>
+    </section>
+
+    <section id="collection" class="collection-layout">
+      <div class="collection-main">
+        <div class="collection-heading">
+          <div class="heading-title"><h2>Your collection</h2><span id="visible-count">Loading…</span></div>
+          <div class="filters" role="group" aria-label="Filter collection type">
+            <button class="filter active" data-type="all">All</button>
+            <button class="filter" data-type="book">Book</button>
+            <button class="filter" data-type="dvd">DVD</button>
+          </div>
+          <label class="available-filter"><input id="available-only" type="checkbox"><span class="switch"></span>Available only</label>
+        </div>
+        <div id="notice" class="notice" role="status" hidden><span class="notice-symbol">ⓘ</span><span id="notice-text"></span><button id="dismiss-notice" aria-label="Dismiss message">×</button></div>
+        <div class="table-head"><span>TITLE / AUTHOR</span><span>FORMAT / EXTENT</span><span>STATUS</span><span>ACTIONS</span></div>
+        <div id="item-list" class="item-list" aria-live="polite"></div>
+        <div class="list-foot"><span id="list-summary"></span><span id="editing-summary"></span></div>
+      </div>
+
+      <aside id="form-panel" class="form-panel" aria-labelledby="form-title">
+        <div class="panel-heading">
+          <div><p class="eyebrow">COLLECTION RECORD</p><h2 id="form-title">Add an item</h2></div>
+          <button id="close-form" class="icon-button close-button" aria-label="Close form">×</button>
+        </div>
+        <form id="item-form">
+          <label class="field-label" for="title">Title</label>
+          <input id="title" name="title" required placeholder="A story worth sharing">
+          <label class="field-label" for="author">Author</label>
+          <input id="author" name="author" required placeholder="Author or director">
+          <span class="field-label">Type</span>
+          <div class="type-picker" role="group" aria-label="Item type">
+            <button type="button" class="type-option selected" data-item-type="book"><span>▤</span> Book</button>
+            <button type="button" class="type-option" data-item-type="dvd"><span>◉</span> DVD</button>
+          </div>
+          <label class="field-label" id="detail-label" for="detail">Page count</label>
+          <div class="input-with-unit"><input id="detail" name="detail" type="number" min="1" required placeholder="320"><span id="detail-unit">pages</span></div>
+          <p id="detail-help" class="field-help">Total number of pages in this edition.</p>
+          <div class="form-actions"><button class="button button-primary save-button" type="submit">Save item</button><button id="cancel-form" class="button button-secondary" type="button">Cancel</button></div>
+          <p class="form-hint">All fields are required.</p>
+        </form>
+      </aside>
+    </section>
+
+  </main>
+  <footer class="footer"><span>Local collection · Changes reset when the server restarts</span><strong>Good stories, in circulation.</strong></footer>
+  <script src="{{ url_for('static', filename='script.js') }}" type="module"></script>
+</body>
+</html>
